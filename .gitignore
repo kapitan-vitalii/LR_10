@@ -37,6 +37,10 @@
 *.suo
 *.VC.db
 *.VC.opendb
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 
 # Build folders
 Debug/
