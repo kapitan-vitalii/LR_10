@@ -8,12 +8,12 @@ int Area(int a, int b);
 double Cost_Brutto(int a, int b, Mater& mater);
 double Count_By_Mater(Mater& mater, Chokhol& chokhol);
 double Final_Cost(Mater& mater, double materialPrice);
-
 void sortFileByMaterial(const char* fileName);
 
-
-int S, a, b, count;
+int S, a, b, kilkist;
 double materialPrice;
+
+fstream txt;
 
 int Area(int a, int b) {
 
@@ -28,17 +28,28 @@ int Area(int a, int b) {
 // площа
 	S = a * b;
 	cout << "Площа розрізу зі швом = " << S;
+    txt.open("result.txt", ios::out);
+    txt << "Площа розрізу зі швом = " << S;
+    txt.close();
 	return S;
 }
 
 double Cost_Brutto(int a, int b, Mater& mater) {
 	materialPrice = S * mater.cost;
 	cout << "Собівартість на виготовлення матеріалів = " << materialPrice;
+    txt.open("result.txt", ios::out);
+    txt << "Собівартість на виготовлення матеріалів = " << materialPrice;
+    txt.close();
 	return materialPrice;
 }
 
 double Count_By_Mater(Mater& mater, Chokhol& chokhol) {
-	return mater.count / chokhol.mater;
+    kilkist = mater.count / chokhol.mater;
+    cout << "Кількість чехлів з вказаного матеріалу = " << kilkist;
+    txt.open("result.txt", ios::out);
+    txt << "Кількість чехлів з вказаного матеріалу = " << kilkist;
+    txt.close();
+	return kilkist;
 }
 
 double Final_Cost(Mater& mater, double materialPrice) {
@@ -47,6 +58,11 @@ double Final_Cost(Mater& mater, double materialPrice) {
 
 	double costWithAmort = materialPrice * (1 + amortization);
 	double finalPrice = costWithAmort * (1 + profit);
+
+    cout << "Фінальна ціна = " << finalPrice;
+    txt.open("result.txt", ios::out);
+    txt << "Фінальна ціна = " << finalPrice;
+    txt.close();
 
 	return finalPrice;
 }
