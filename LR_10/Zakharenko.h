@@ -1,120 +1,174 @@
-#ifndef Zakharenko_H
-#define Zakharenko_H
+#pragma once
+
+#ifndef ZAKHARENKO_H
+#define ZAKHARENKO_H
+
 #include "Shevko.h"
+#include "Datskyi.h"
 
-using namespace std;
+double area(double h, double w);
+void cutting();
+double final_Cost(double h, double w, double cost);
+void cost_Chokhol(const char* filename);
+void month_Income(const char* filename);
 
-int Area(int a, int b);
-double Cost_Brutto(int a, int b, Mater& mater);
-double Count_By_Mater(Mater& mater, Chokhol& chokhol);
-double Final_Cost(Mater& mater, double materialPrice);
-void sortFileByMaterial(const char* fileName);
-
-int S, a, b, kilkist;
-double materialPrice;
-
-void createf1_txt() {
-    ofstream txt("result.txt");
-    txt << "Результати тестування проекту";
-    txt.close();
-
-}
-
-int Area(int a, int b) {
-
-	cout << "Введіть довжину розрізу: ";
-	cin >> a;
-	cout << "Введіть ширину розрізу: ";
-	cin >> b;
-
-// шов
-	a++;
-	b++;
-// площа
-	S = a * b;
-	cout << "Площа розрізу зі швом = " << S;
-    ofstream txt("result.txt", ios::app);
-    txt << "Площа розрізу зі швом = " << S;
-    txt.close();
-	return S;
-}
-
-double Cost_Brutto(int a, int b, Mater& mater) {
-	materialPrice = S * mater.cost;
-	cout << "Собівартість на виготовлення матеріалів = " << materialPrice;
-    ofstream txt("result.txt", ios::app);
-    txt << "Собівартість на виготовлення матеріалів = " << materialPrice;
-    txt.close();
-	return materialPrice;
-}
-
-double Count_By_Mater(Mater& mater, Chokhol& chokhol) {
-    kilkist = mater.count / chokhol.mater;
-    cout << "Кількість чехлів з вказаного матеріалу = " << kilkist;
-    ofstream txt("result.txt", ios::app);
-    txt << "Кількість чехлів з вказаного матеріалу = " << kilkist;
-    txt.close();
-	return kilkist;
-}
-
-double Final_Cost(Mater& mater, double materialPrice) {
-	const double amortization = 13.567 / 100.0;
-	const double profit = 10.0 / 100.0;        
-
-	double costWithAmort = materialPrice * (1 + amortization);
-	double finalPrice = costWithAmort * (1 + profit);
-
-    cout << "Фінальна ціна = " << finalPrice;
-    ofstream txt("result.txt", ios::app);
-    txt << "Фінальна ціна = " << finalPrice;
-    txt.close();
-
-	return finalPrice;
-}
-
-
-void sortFileByMaterial(const char* fileName)
+//1
+double area(double a, double b)
 {
-    ifstream inFile(fileName, ios::binary);
-    if (!inFile)
-    {
-        cout << "Помилка відкриття файлу!" << endl;
-        return;
-    }
+    a += 0.01;
+    b += 0.01;
 
-    inFile.seekg(0, ios::end);
-    int count = inFile.tellg() / sizeof(Mater);
-    inFile.seekg(0, ios::beg);
+    return a * b;
+}
 
-    Mater* mas = new Mater[count];
+void cutting()
+{
+    double h, w;
+    fstream f1;
+    f1.open("Log.txt", ios::out | ios::app);
 
-    for (int i = 0; i < count; i++)
-    {
-        inFile.read((char*)&mas[i], sizeof(Mater));
-    }
-    inFile.close();
+    cout << "\nВведіть довжину розрізу: ";
+    cin >> h;
+    cout << "Введіть ширину розрізу: ";
+    cin >> w;
+    cout << "Площа розкрою " << area(h, w) << " (м^2)\n";
+    cout << endl;
 
-    for (int i = 0; i < count - 1; i++)
-    {
-        for (int j = 0; j < count - i - 1; j++)
+
+    f1 << "\n\nВведіть довжину розрізу: ";
+    f1 << h;
+    f1 << "\nВведіть ширину розрізу: ";
+    f1 << w;
+    f1 << "\nПлоща розкрою " << area(h, w) << " (м^2)\n";
+    f1 << endl;
+
+    f1.close();
+}
+
+//4
+void cost_Chokhol(const char* filename)
+{
+    Mater mater;
+    fstream file, f1;
+    double h, w;
+    char material[20];
+    bool found = false;
+    file.open(filename, ios::in | ios::binary);
+    f1.open("Log.txt", ios::out | ios::app);
+    cout << "Введіть назву матеріалу: ";
+    cin.ignore();
+    cin.getline(material, 20);
+
+    f1 << "\n\nВведіть назву матеріалу: ";
+    f1 << material;
+
+    while (file.read((char*)&mater, sizeof(mater)))
+        if (strcmp(mater.mater, material) == 0)
         {
-            if (strcmp(mas[j].mater, mas[j + 1].mater) > 0)
-            {
-                Mater temp = mas[j];
-                mas[j] = mas[j + 1];
-                mas[j + 1] = temp;
-            }
+            found = true;
+            break;
+        }
+    if (found)
+    {
+        cout << "Введіть довжину розрізу: ";
+        cin >> h;
+        cout << "Введіть ширину розрізу: ";
+        cin >> w;
+        cout << "Ціна чохла на продаж: " << final_Cost(h, w, mater.cost) << endl;
+
+        f1 << "\nВведіть довжину розрізу: ";
+        f1 << h;
+        f1 << "\nВведіть ширину розрізу: ";
+        f1 << w;
+        f1 << "\nЦіна чохла на продаж: " << final_Cost(h, w, mater.cost) << endl;
+    }
+    else
+    {
+        cout << "Не знайдено матеріал " << material << ".\n";
+        f1 << "Не знайдено матеріал " << material << ".\n";
+    }
+
+    file.close();
+    f1.close();
+}
+
+double final_Cost(double h, double w, double cost)
+{
+    double amortization = .13567;
+    double profit = .10;
+
+    double costWithAmort = cost_Brutto(h, w, cost) * (1.0 + amortization);
+    double finalPrice = costWithAmort * (1.0 + profit);
+
+    return finalPrice;
+}
+
+//5
+void month_Income(const char* filename)
+{
+    Mater mater;
+    fstream file, f1;
+    char material[20];
+    bool found = false;
+    double sum, h, w;
+    int k;
+
+    file.open(filename, ios::in | ios::binary);
+    f1.open("Log.txt", ios::out | ios::app);
+
+    cout << "Введіть матеріал: ";
+    cin.ignore();
+    cin.getline(material, 20);
+    f1 << "\n\nВведіть матеріал: ";
+    f1 << material;
+
+    while (file.read((char*)&mater, sizeof(mater)))
+        if (strcmp(mater.mater, material) == 0)
+        {
+            found = true;
+            break;
+        }
+
+    if (found)
+    {
+        cout << "Введіть довжину розрізу: ";
+        cin >> h;
+        cout << "Введіть ширину розрізу: ";
+        cin >> w;
+        cout << "Введіть к-ть чохлів: ";
+        cin >> k;
+
+        f1 << "\nВведіть довжину розрізу: ";
+        f1 << h;
+        f1 << "\nВведіть ширину розрізу: ";
+        f1 << w;
+        f1 << "\nВведіть к-ть чохлів: ";
+        f1 << k;
+
+        file.clear();
+        file.seekg(0, ios::beg);
+
+        sum = mater.count * area(mater.width, mater.height) - area(h, w) * k;
+
+        if (sum < 0)
+        {
+            cout << "Не вистачає" << -sum << " (м^2) матеріалу";
+            f1 << "\nНе вистачає" << -sum << " (м^2) матеріалу";
+        }
+        else
+        {
+            cout << "Місячний дохід: " << fixed << setprecision(2) << final_Cost(h, w, mater.cost) * k;
+            f1 << "\nМісячний дохід: " << fixed << setprecision(2) << final_Cost(h, w, mater.cost) * k;
         }
     }
-
-    ofstream outFile(fileName, ios::binary | ios::trunc);
-    for (int i = 0; i < count; i++)
+    else
     {
-        outFile.write((char*)&mas[i], sizeof(Mater));
+        cout << "Не знайдено матеріал " << material << ".\n";
+        f1 << "\nНе знайдено матеріал " << material << ".\n";
     }
-    outFile.close();
 
-    delete[] mas;
+    file.close();
+    f1.close();
 }
 
 #endif
